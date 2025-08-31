@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sterra AI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0D0D17;
+      color: #E0E0E0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(30, 30, 46, 0.8);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(106, 61, 232, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      color: #B399FF;
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .tagline {
+      color: #B399FF;
+      font-weight: 300;
+      font-size: 1.1rem;
+    }
+
+    .api-key-container {
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    .api-key-input {
+      width: 300px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #6A3DE8;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin: 5px;
+    }
+
+    .api-key-btn {
+      background: #6A3DE8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .chat-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 1.5rem;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Message Bubbles */
+    .message {
+      max-width: 80%;
+      padding: 12px 18px;
+      border-radius: 18px;
+      animation: fadeIn 0.3s ease;
+      line-height: 1.4;
+    }
+
+    .user-message {
+      background: #6A3DE8;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+
+    .ai-message {
+      background: #2D2B42;
+      color: #E0E0E0;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-typing {
+      align-self: flex-start;
+      background: #2D2B42;
+      color: #B399FF;
+      padding: 12px 20px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #B399FF;
+      border-radius: 50%;
+      animation: typingAnimation 1.5s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Input Area */
+    .input-area {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 2px solid rgba(106, 61, 232, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6A3DE8;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      background: #6A3DE8;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 24px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #5A2DC8;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes typingAnimation {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    /* Scrollbar Styling */
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-box::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+      background: #6A3DE8;
+      border-radius: 10px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      button {
+        padding: 14px 20px;
+      }
+      
+      .api-key-input {
+        width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Sterra AI</h1>
+      <p class="tagline">Your basic, friendly AI assistant</p>
+    </div>
+
+    <div class="api-key-container" id="apiKeyContainer">
+      <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Enter your Groq API Key" />
+      <button class="api-key-btn" onclick="setApiKey()">Save API Key</button>
+      <p style="font-size: 12px; margin-top: 5px;">
+        Get free key from: <a href="https://console.groq.com" target="_blank" style="color: #B399FF;">console.groq.com</a>
+      </p>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-box" id="chatBox">
+        <div class="message ai-message">
+          <strong>Sterra:</strong> Hello! I'm Sterra AI. Please enter your Groq API key above to start chatting with advanced AI capabilities!
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask me something..." disabled>
+        <button id="sendButton" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiKeyContainer = document.getElementById('apiKeyContainer');
+
+    // Global variables
+    let groqApiKey = '';
+    let isApiEnabled = false;
+
+    // Pre-defined responses for basic questions
+    const predefinedResponses = {
+      "hello": "Hi there! How can I help you today?",
+      "hi": "Hello! What can I do for you?",
+      "how are you": "I'm just a simple AI, but I'm functioning well! How can I assist you?",
+      "what can you do": "I can answer basic questions, have simple conversations, and help with general knowledge topics!",
+      "who are you": "I'm Sterra AI, a basic AI assistant designed to help with simple questions.",
+      "thank you": "You're welcome! Is there anything else you'd like to know?",
+      "thanks": "You're welcome! Happy to help!",
+      "bye": "Goodbye! Feel free to come back if you have more questions!",
+      "goodbye": "See you later! Have a great day!",
+      "what is your name": "I'm Sterra AI, your friendly basic assistant!",
+      "help": "I can help with general questions, simple facts, and basic conversations. Try asking me anything!",
+      "who made you": "I was created by developers who wanted a simpler, more basic AI experience.",
+      "what time is it": "I don't have access to real-time clock data, but you can check your device's time!",
+      "weather": "I don't have weather data capabilities, but you can check a weather app or website!"
+    };
+
+    // API Key Functions
+    function setApiKey() {
+      const key = apiKeyInput.value.trim();
+      if (key) {
+        if (key.startsWith('gsk_')) {
+          groqApiKey = key;
+          isApiEnabled = true;
+          userInput.disabled = false;
+          sendButton.disabled = false;
+          apiKeyContainer.style.display = 'none';
+          addMessage("API key set successfully! You can now ask me anything!", 'ai');
+        } else {
+          addMessage("Invalid API key format. Groq keys should start with 'gsk_'.", 'ai');
+        }
+      } else {
+        addMessage("Please enter a valid API key.", 'ai');
+      }
+    }
+
+    // Event Listeners
+    userInput.addEventListener('keypress', handleKeyPress);
+    sendButton.addEventListener('click', sendMessage);
+
+    // Event Handlers
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      // Add user message to chat
+      addMessage(message, 'user');
+      userInput.value = '';
+
+      // Show typing indicator
+      showTypingIndicator();
+
+      // Check for predefined response first
+      const lowerMessage = message.toLowerCase();
+      if (predefinedResponses[lowerMessage]) {
+        // Simulate typing delay for predefined responses
+        setTimeout(() => {
+          removeTypingIndicator();
+          addMessage(predefinedResponses[lowerMessage], 'ai');
+        }, 1000);
+      } else {
+        if (isApiEnabled && groqApiKey) {
+          // Use Groq API for advanced responses
+          try {
+            const response = await getGroqAIResponse(message);
+            removeTypingIndicator();
+            addMessage(response, 'ai');
+          } catch (error) {
+            removeTypingIndicator();
+            addMessage("I'm having trouble connecting to the AI service. Please check your API key or try again later.", 'ai');
+            console.error('API Error:', error);
+          }
+        } else {
+          // Use basic response if no API
+          setTimeout(() => {
+            removeTypingIndicator();
+            addMessage("I'm currently in basic mode. Please add a Groq API key for advanced responses!", 'ai');
+          }, 1000);
+        }
+      }
+    }
+
+    // Groq API Function
+    async function getGroqAIResponse(userMessage) {
+      const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${groqApiKey}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are Sterra AI, a friendly and helpful assistant. Keep responses concise (1-2 sentences) and conversational.'
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          max_tokens: 150,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content.trim();
+    }
+
+    // UI Functions
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(sender + '-message');
+      
+      const prefix = sender === 'user' ? '<strong>You:</strong> ' : '<strong>Sterra:</strong> ';
+      messageDiv.innerHTML = prefix + text;
+      
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.classList.add('message-typing');
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <strong>Sterra:</strong> Thinking
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      chatBox.appendChild(typingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    // Initialize
+    userInput.focus();
+  </script>
+</body>
+</html>
